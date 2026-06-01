@@ -1,0 +1,17 @@
+# local client env config
+desktop-client/.env
+desktop-client/.env.template
+
+# python build and virtual environment outputs
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+build/
+dist/
+*.egg-info/
+
+# AWS SAM infrastructure build folders
+.aws-sam/
+aws-backedn/.env.sam

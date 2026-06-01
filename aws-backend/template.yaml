@@ -1,0 +1,136 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Deploys native serverless AI/ML threat scanning platform via Bedrock & SageMaker.
+
+Parameters:
+  NotificationEmail:
+    Type: String
+    Description: Verified target email routing address for Amazon SES alerts.
+  RefreshRateInMinutes:
+    Type: Number
+    Default: 60
+
+Resources:
+  VectorStorageBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub threatpulse-vectors-${AWS::AccountId}
+
+  ConfigTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      TableName: ThreatPulse_Config
+      PrimaryKey: {Name: company_id, Type: String}
+
+  AlertsTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      TableName: ThreatPulse_Alerts
+      PrimaryKey: {Name: alert_id, Type: String}
+
+  SemanticCacheTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      TableName: ThreatPulse_SemanticCache
+      PrimaryKey: {Name: embedding_hash, Type: String}
+
+  # --- Upstream SageMaker Serverless ML Stack ---
+  SageMakerModel:
+    Type: AWS::SageMaker::Model
+    Properties:
+      ModelName: !Sub threatpulse-classifier-${AWS::StackName}
+      PrimaryContainer:
+        Image: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/xgboost:latest
+        ModelDataUrl: !Sub s3://threatpulse-vectors-${AWS::AccountId}/models/artifacts.tar.gz
+      ExecutionRoleArn: !GetAtt SageMakerExecutionRole.Arn
+
+  SageMakerEndpointConfig:
+    Type: AWS::SageMaker::EndpointConfig
+    Properties:
+      EndpointConfigName: !Sub threatpulse-config-${AWS::StackName}
+      ProductionVariants:
+        - VariantName: AllTraffic
+          ModelName: !GetAtt SageMakerModel.ModelName
+          ServerlessConfig:
+            MaxConcurrency: 10
+            MemorySizeInMB: 2048
+
+  SageMakerServerlessEndpoint:
+    Type: AWS::SageMaker::Endpoint
+    Properties:
+      EndpointName: threatpulse-predictive-scorer
+      EndpointConfigName: !GetAtt SageMakerEndpointConfig.EndpointConfigName
+
+  SageMakerExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: {Service: [sagemaker.amazonaws.com]}
+            Action: ['sts:AssumeRole']
+      Policies:
+        - PolicyName: SageMakerS3Access
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: ['s3:GetObject', 's3:ListBucket']
+                Resource: ['*']
+
+  # --- Core Orchestrator API Gateway & Compute ---
+  OrchestratorLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: function_orchestrator/
+      Handler: app.main.lambda_handler
+      Runtime: python3.11
+      MemorySize: 3008
+      Timeout: 300
+      Environment:
+        Variables:
+          CONFIG_TABLE: !Ref ConfigTable
+          ALERTS_TABLE: !Ref AlertsTable
+          CACHE_TABLE: !Ref SemanticCacheTable
+          VECTOR_BUCKET: !Ref VectorStorageBucket
+          NOTIFY_EMAIL: !Ref NotificationEmail
+          SAGEMAKER_ENDPOINT: !GetAtt SageMakerServerlessEndpoint.EndpointName
+      Policies:
+        - DynamoDBCrudPolicy: {TableName: !Ref ConfigTable}
+        - DynamoDBCrudPolicy: {TableName: !Ref AlertsTable}
+        - DynamoDBCrudPolicy: {TableName: !Ref SemanticCacheTable}
+        - S3CrudPolicy: {BucketName: !Ref VectorStorageBucket}
+        - SESCrudPolicy: {IdentityName: !Ref NotificationEmail}
+        - Statement:
+            - Effect: Allow
+              Action: ['bedrock:InvokeModel', 'sagemaker:InvokeEndpoint']
+              Resource: ['*']
+
+  ApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      Cors: "'*'"
+
+  ScheduledIntelligenceRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: Triggers intelligence cycle continuously in background.
+      ScheduleExpression: !Sub rate(${RefreshRateInMinutes} minutes)
+      State: ENABLED
+      Targets:
+        - Arn: !GetAtt OrchestratorLambda.Arn
+          Id: OrchestratorTarget
+
+  PermissionForEventsToInvokeLambda:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref OrchestratorLambda
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt ScheduledIntelligenceRule.Arn
+
+Outputs:
+  ApiUrl:
+    Value: !Sub https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod
