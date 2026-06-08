@@ -1,5 +1,4 @@
-```markdown
-# 📡 Project 4: ThreatPulse — Autonomous Multi-Agent AWS Threat Intelligence Cockpit
+# 📡 Project 4: ThreatPulse: Autonomous Multi-Agent AWS Threat Intelligence Cockpit
 
 An advanced, production-grade autonomous threat intelligence and security orchestration platform designed to revolutionize cloud incident forensics and real-time perimeter defense. **ThreatPulse** orchestrates a high-performance dual-engine framework: an active multi-agent stream parser that continuously harvests security telemetry from multi-layer AWS environments (AWS CloudTrail, AWS Cognito, and AWS Config Rules), and a generative analysis pipeline powered by **Amazon Bedrock** to deliver explainable, contextual threat summaries.
 
@@ -10,7 +9,7 @@ Built natively using **Python**, **CustomTkinter**, **TkinterMapView**, and secu
 ## 📸 Screenshots
 
 ### Application Preview
-![ThreatPulse Cockpit Workspace](screenshots/3.png)
+![ThreatPulse Cockpit Workspace](screenshots/4.png)
 
 ---
 
@@ -83,16 +82,14 @@ Built natively using **Python**, **CustomTkinter**, **TkinterMapView**, and secu
                        +-------------+-------------+
                        | Responders Inbox Dispatch |
                        +---------------------------+
-
 ```
-
 ---
 
 ## 🖼️ Interface Matrix
 
-| Landing Workspace | Stream Synced Alert Feed | Deep Forensic Drilldown | Escaslation Control Room |
-| --- | --- | --- | --- |
-|  |  |  |  |
+| Landing Workspace | Stream Synced Alert Feed | Deep Forensic Drilldown | Escalation Control Room |
+|:---:|:---:|:---:|:---:|
+| ![Provisioning Panel](screenshots/1.png) | ![Clear Telemetry Stream](screenshots/3.png) | ![Critical Blast Radius Analysis](screenshots/4.jpg) <br><br> ![Identity Threat Forensics](screenshots/5.png) | ![SOAR Escalation Dialog](screenshots/7.png) |
 | *System Provisioning state.* | *Active telemetry synchronization.* | *Geospatial tracking & AI summaries.* | *Asynchronous routing modal.* |
 
 ---
