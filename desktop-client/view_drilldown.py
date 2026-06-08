@@ -16,7 +16,6 @@ class DrilldownPanel(ctk.CTkFrame):
         map_frame = ctk.CTkFrame(self, height=250)
         map_frame.pack(fill="x", padx=15, pady=15)
         
-        # FIX: Unified spelling variable name to self.map_widget
         self.map_widget = TkinterMapView(map_frame, width=600, height=250, corner_radius=8)
         self.map_widget.pack(fill="both", expand=True)
         self.project_spatial_coordinates()
@@ -26,8 +25,8 @@ class DrilldownPanel(ctk.CTkFrame):
         gauge_frame.pack(fill="x", padx=20, pady=5)
         ctk.CTkLabel(gauge_frame, text=f"📊 THREAT INFRASTRUCTURE RISK SEVERITY CRITICAL INDEX ENGINE LEVEL: {self.alert['threat_severity']}%", font=("Courier", 16, "bold"), text_color="#ef4444").pack(anchor="w")
         
-        # Explainable Structured Operational AI Diagnostic Insights Telemetry Blocks Components UI Outputs 
-        insights_box = ctk.CTkTextBox(self, fg_color="#1f2937", border_color="#374151", border_width=1, font=("Arial", 12), height=180)
+        # FIX: Changed ctk.CTkTextBox to ctk.CTkTextbox (lowercase 'b')
+        insights_box = ctk.CTkTextbox(self, fg_color="#1f2937", border_color="#374151", border_width=1, font=("Arial", 12), height=180)
         insights_box.pack(fill="both", expand=True, padx=20, pady=10)
 
         diagnostics_payload = (
@@ -55,16 +54,14 @@ class DrilldownPanel(ctk.CTkFrame):
         ctk.CTkButton(ctrl_ribbon, text="Reject ✕", fg_color="#ef4444", hover_color="#dc2626", font=("Arial", 13, "bold"), command=self.fire_reject).pack(side="right", padx=5, expand=True, fill="x")
 
     def project_spatial_coordinates(self):
-        # Resolve geographic locations across both Localized and Distributed operational tracking arrays
         locs = self.alert.get('localized_locations', []) or self.alert.get('distributed_locations', [])
         if locs:
-            # FIX: Variable target reference now correctly references normalized map_widget
             self.map_widget.set_position(locs[0]['lat'], locs[0]['lon'])
             self.map_widget.set_zoom(6 if self.alert.get('localized_locations') else 2)
             for point in locs:
                 self.map_widget.set_marker(point['lat'], point['lon'], text=f"Target Event: {point.get('city') or point.get('country')}")
         else:
-            self.map_widget.set_position(38.8951, -77.0364) # Global architectural mapping anchor frame baseline coordinate grid reference
+            self.map_widget.set_position(38.8951, -77.0364)
 
     def fire_resolve(self):
         ApiClient.trigger_action(self.alert['alert_id'], "resolve")
@@ -80,5 +77,4 @@ class DrilldownPanel(ctk.CTkFrame):
     def fire_reject(self):
         ApiClient.trigger_action(self.alert['alert_id'], "reject")
         self.refresh_dashboard()
-        # FIX: Directly collapse this component space safely to wipe the drilldown workspace selection
         self.destroy()
