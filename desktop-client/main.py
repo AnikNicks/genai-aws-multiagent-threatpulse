@@ -11,13 +11,18 @@ class CoreThreatPulseApplicationHub(ctk.CTk):
         ctk.set_appearance_mode("dark")
         
         self.app_state = ClientState()
-        
         self.active_rendered_view = None
         
-        # initiate zero-state stateless data verification protocol network handshake execution runtime loop
+        # Initial cold boot handshake check
         self.execute_initialization_handshake()
         
-    def execute_initializaiton_handshake(self):
+    def execute_initialization_handshake(self, forced_bypass=False):
+        # FIX: Explicitly check if we are forcing a dashboard view render after a successful setup submission
+        if forced_bypass:
+            print("⚡ [BYPASS] Onboarding submitted successfully. Forcing transition to active dashboard panel...")
+            self.render_dashboard_workspace()
+            return
+
         try:
             from api_client import ApiClient
             response_data = ApiClient.get_status()
@@ -28,12 +33,19 @@ class CoreThreatPulseApplicationHub(ctk.CTk):
             else:
                 self.render_configuration_workspace()
         except Exception as system_fault_error:
-            print(f"AWS Network Backend unavailable. Standard offline initialization initialization bypass triggered: {system_fault_error}")
+            print(f"AWS Network Backend unavailable. Standard offline initialization bypass triggered: {system_fault_error}")
             self.render_configuration_workspace()
+            
+    def render_dashboard_workspace(self):
+        if self.active_rendered_view: 
+            self.active_rendered_view.destroy()
+        self.active_rendered_view = DashboardView(self, self.app_state, self.execute_initialization_handshake)
+        self.active_rendered_view.pack(fill="both", expand=True)
     
     def render_configuration_workspace(self):
-        if self.active_rendered_view: self.active_rendered_view.destroy()
-        self.active_rendered_view = DashboardView(self, self.app_state, self.execute_initializaiton_handshake)
+        if self.active_rendered_view: 
+            self.active_rendered_view.destroy()
+        self.active_rendered_view = ConfigurationView(self, self.app_state, self.execute_initialization_handshake)
         self.active_rendered_view.pack(fill="both", expand=True)
         
 if __name__ == "__main__":

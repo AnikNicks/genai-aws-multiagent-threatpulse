@@ -1,0 +1,13 @@
+version = 0.1
+
+[default.deploy.parameters]
+stack_name = "genai-aws-multiagent-threatpulse"
+resolve_s3 = true
+s3_prefix = "genai-aws-multiagent-threatpulse"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "NotificationEmail=\"threatpulseapp@gmail.com\" RefreshRateInMinutes=\"60\""
+image_repositories = []
+
+[default.global.parameters]
+region = "us-east-1"

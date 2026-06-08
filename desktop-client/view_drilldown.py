@@ -12,14 +12,16 @@ class DrilldownPanel(ctk.CTkFrame):
         self.grid_columnconfigure(0, weight=1)
         self.pack(fill="both", expand=True, padx=5, pady=5)
         
-        # embedded map core instance container canvas
+        # Embedded map core instance container canvas
         map_frame = ctk.CTkFrame(self, height=250)
         map_frame.pack(fill="x", padx=15, pady=15)
-        self.map_weight = TkinterMapView(map_frame, width=600, height=250, corner_radius=8)
-        self.map_wedget.pack(fill="both", expand=True)
+        
+        # FIX: Unified spelling variable name to self.map_widget
+        self.map_widget = TkinterMapView(map_frame, width=600, height=250, corner_radius=8)
+        self.map_widget.pack(fill="both", expand=True)
         self.project_spatial_coordinates()
         
-        # radial risk progress metrics framework tracking header panel row display gauge components
+        # Radial risk progress metrics framework tracking header panel row display gauge components
         gauge_frame = ctk.CTkFrame(self, fg_color="transparent")
         gauge_frame.pack(fill="x", padx=20, pady=5)
         ctk.CTkLabel(gauge_frame, text=f"📊 THREAT INFRASTRUCTURE RISK SEVERITY CRITICAL INDEX ENGINE LEVEL: {self.alert['threat_severity']}%", font=("Courier", 16, "bold"), text_color="#ef4444").pack(anchor="w")
@@ -56,6 +58,7 @@ class DrilldownPanel(ctk.CTkFrame):
         # Resolve geographic locations across both Localized and Distributed operational tracking arrays
         locs = self.alert.get('localized_locations', []) or self.alert.get('distributed_locations', [])
         if locs:
+            # FIX: Variable target reference now correctly references normalized map_widget
             self.map_widget.set_position(locs[0]['lat'], locs[0]['lon'])
             self.map_widget.set_zoom(6 if self.alert.get('localized_locations') else 2)
             for point in locs:
@@ -77,4 +80,5 @@ class DrilldownPanel(ctk.CTkFrame):
     def fire_reject(self):
         ApiClient.trigger_action(self.alert['alert_id'], "reject")
         self.refresh_dashboard()
-        for w in self.master.winfo_children(): w.destroy() # Self wipe detailed panel layout gracefully upon operational deletion
+        # FIX: Directly collapse this component space safely to wipe the drilldown workspace selection
+        self.destroy()

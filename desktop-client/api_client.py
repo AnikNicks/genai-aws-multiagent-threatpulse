@@ -12,7 +12,8 @@ class ApiClient:
     
     @staticmethod
     def fetch_alerts():
-        return requests.get(f"{API_URL}/alerts", timeout=10).json.get('alerts', [])
+        # FIX: Appended () to evaluate the json parsing engine before fetching keys
+        return requests.get(f"{API_URL}/alerts", timeout=10).json().get('alerts', [])
     
     @staticmethod
     def trigger_action(alert_id, action, context_payload=None):
