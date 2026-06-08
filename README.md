@@ -89,7 +89,7 @@ Built natively using **Python**, **CustomTkinter**, **TkinterMapView**, and secu
 
 | Landing Workspace | Stream Synced Alert Feed | Deep Forensic Drilldown | Escalation Control Room |
 |:---:|:---:|:---:|:---:|
-| ![Provisioning Panel](screenshots/1.png) | ![Clear Telemetry Stream](screenshots/1.png) | ![Critical Blast Radius Analysis](screenshots/4.jpg) <br><br> ![Identity Threat Forensics](screenshots/5.png) | ![SOAR Escalation Dialog](screenshots/7.png) |
+| ![Provisioning Panel](screenshots/2.png) | ![Clear Telemetry Stream](screenshots/3.png) | ![Critical Blast Radius Analysis](screenshots/4.jpg) <br><br> ![Identity Threat Forensics](screenshots/5.png) | ![SOAR Escalation Dialog](screenshots/7.png) |
 | *System Provisioning state.* | *Active telemetry synchronization.* | *Geospatial tracking & AI summaries.* | *Asynchronous routing modal.* |
 
 ---
