@@ -1,4 +1,3 @@
-```markdown
 # 📡 Project 4: ThreatPulse — Autonomous Multi-Agent AWS Threat Intelligence Cockpit
 
 An advanced, production-grade autonomous threat intelligence and security orchestration platform designed to revolutionize cloud incident forensics and real-time perimeter defense. **ThreatPulse** orchestrates a high-performance dual-engine framework: an active multi-agent stream parser that continuously harvests security telemetry from multi-layer AWS environments (AWS CloudTrail, AWS Cognito, and AWS Config Rules), and a generative analysis pipeline powered by **Amazon Bedrock** to deliver explainable, contextual threat summaries.
@@ -83,8 +82,6 @@ Built natively using **Python**, **CustomTkinter**, **TkinterMapView**, and secu
                        +-------------+-------------+
                        | Responders Inbox Dispatch |
                        +---------------------------+
-
-```
 
 ---
 
